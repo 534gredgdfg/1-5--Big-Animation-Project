@@ -10,8 +10,9 @@ namespace _1_5__Big_Animation_Project
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private SpriteFont introTitleText, mediumText;
+        int speed = 2;
         //c stands for Coyote and r stands for Roadrunner
-        Texture2D cStill, cRunning, cReady, rStill, rRunning, rSprinting, inroBackround, animationBackround;
+        Texture2D cStill, cSprintingRight, cSprintingLeft, cReady, rStill, rRunning, rRunningRight, rSprinting, rSprintingRight, inroBackround, animationBackround;
         Rectangle coyoteRect, roadrunnerRect;
         Vector2 coyoteVector, roadrunnerVector;
         MouseState mouseState;
@@ -58,11 +59,14 @@ namespace _1_5__Big_Animation_Project
             animationBackround = Content.Load<Texture2D>("animationBackround");
 
             cStill = Content.Load<Texture2D>("coyote-still");
-            cRunning = Content.Load<Texture2D>("coyote-running");
+            cSprintingRight = Content.Load<Texture2D>("coyote-sprinting");
+            cSprintingLeft = Content.Load<Texture2D>("coyote-sprinting-left");
             cReady = Content.Load<Texture2D>("coyote-ready");
             rStill = Content.Load<Texture2D>("roadrunner-still");
-            rRunning = Content.Load<Texture2D>("roadrunner-running");
+            rRunning = Content.Load<Texture2D>("roadrunner");
+            rRunningRight = Content.Load<Texture2D>("roadrunner-right");
             rSprinting = Content.Load<Texture2D>("roadrunner-sprinting");
+            rSprintingRight = Content.Load<Texture2D>("roadrunner-sprinting-right");
 
             introTitleText = Content.Load<SpriteFont>("Title");
             mediumText = Content.Load<SpriteFont>("mediumText");
@@ -93,36 +97,39 @@ namespace _1_5__Big_Animation_Project
             else if (screen == Screen.Animation)
             {
 
-                if (keyboardState.IsKeyDown(Keys.Up))
-                {
-                    
-                    roadrunnerVector.Y = -2;
+                if (keyboardState.IsKeyDown(Keys.W))
+                {                    
+                    roadrunnerVector.Y = -speed;
                     
                 }
-                else if (keyboardState.IsKeyDown(Keys.Down))
+                else if (keyboardState.IsKeyDown(Keys.S))
+                {
+
+                    roadrunnerVector.Y = speed;
+                }
+                else if (keyboardState.IsKeyDown(Keys.A))
                 {
 
                     
-                    roadrunnerVector.Y = 2;
+                    roadrunnerVector.X = -speed;
                 }
-                else if (keyboardState.IsKeyDown(Keys.Left))
+                else if (keyboardState.IsKeyDown(Keys.D))
                 {
-
-                    
-                    roadrunnerVector.X = -2;
+      
+                    roadrunnerVector.X = speed;
                 }
-                else if (keyboardState.IsKeyDown(Keys.Right))
+                else
                 {
-
-                    
-                    roadrunnerVector.X = 2;
-                }
-                if (!keyboardState.IsKeyDown(Keys.Up) && !keyboardState.IsKeyDown(Keys.Right) && !keyboardState.IsKeyDown(Keys.Left) && !keyboardState.IsKeyDown(Keys.Down))
-                {
-                    
-
                     roadrunnerVector.Y = 0;
                     roadrunnerVector.X = 0;
+                }
+                if (keyboardState.IsKeyDown(Keys.Space))
+                    speed = 3;
+                else
+                    speed = 2;
+                {
+
+                    
                 }
                 if (roadrunnerRect.Y > coyoteRect.Bottom)
                     coyoteVector.Y = 1;
@@ -142,6 +149,28 @@ namespace _1_5__Big_Animation_Project
 
                 roadrunnerRect.Y += (int)roadrunnerVector.Y;
                 roadrunnerRect.X += (int)roadrunnerVector.X;
+
+                //Keep in playable Area
+                if (roadrunnerRect.Right >= _graphics.PreferredBackBufferWidth)
+                {
+                    roadrunnerRect.X = _graphics.PreferredBackBufferWidth- roadrunnerRect.Width;
+                    roadrunnerVector.X = 0;
+                }
+                else if (roadrunnerRect.X <= 0)
+                {
+                    roadrunnerRect.X = 0;
+                    roadrunnerVector.X = 0;
+                }
+                if (roadrunnerRect.Bottom >= _graphics.PreferredBackBufferHeight)
+                {
+                    roadrunnerRect.Y = _graphics.PreferredBackBufferHeight - roadrunnerRect.Height;
+                    roadrunnerVector.Y = 0;
+                }
+                else if (roadrunnerRect.Y <= _graphics.PreferredBackBufferHeight/2)
+                {
+                    roadrunnerRect.Y = _graphics.PreferredBackBufferHeight / 2;
+                    roadrunnerVector.Y = 0;
+                }
 
             }
             else if (screen == Screen.Outro)
@@ -170,11 +199,29 @@ namespace _1_5__Big_Animation_Project
             else if (screen == Screen.Animation)
             {
                 _spriteBatch.Draw(animationBackround, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), Color.White);
-                _spriteBatch.Draw(cReady, coyoteRect, Color.White);
+
+                if (coyoteVector.X == 1)
+                    _spriteBatch.Draw(cSprintingRight, coyoteRect, Color.White);
+                else
+                    _spriteBatch.Draw(cSprintingLeft, coyoteRect, Color.White);
+
                 if (roadrunnerVector.X == 0 && roadrunnerVector.Y ==0)
                     _spriteBatch.Draw(rStill, roadrunnerRect, Color.White);
-                else 
-                    _spriteBatch.Draw(rRunning, roadrunnerRect, Color.White);
+                else if (speed == 3)
+                {
+                    if (roadrunnerVector.X == speed)
+                        _spriteBatch.Draw(rSprintingRight, roadrunnerRect, Color.White);
+                    else
+                        _spriteBatch.Draw(rSprinting, roadrunnerRect, Color.White);
+                }
+                else
+                {
+                    if (roadrunnerVector.X == speed)
+                        _spriteBatch.Draw(rRunningRight, roadrunnerRect, Color.White);
+                    else 
+                        _spriteBatch.Draw(rRunning, roadrunnerRect, Color.White);
+                }
+                   
             }
             else if (screen == Screen.Outro)
             {
