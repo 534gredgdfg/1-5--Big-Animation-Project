@@ -11,6 +11,10 @@ namespace _1_5__Big_Animation_Project
         private SpriteBatch _spriteBatch;
         private SpriteFont introTitleText, mediumText;
         int speed = 2;
+        int hintLocation = -600;
+        float seconds;
+        float startTime;
+        float addingTime;
         //c stands for Coyote and r stands for Roadrunner
         Texture2D cStill, cSprintingRight, cSprintingLeft, cReady, rStill, rRunning, rRunningRight, rSprinting, rSprintingRight, inroBackround, animationBackround;
         Rectangle coyoteRect, roadrunnerRect;
@@ -41,10 +45,10 @@ namespace _1_5__Big_Animation_Project
             _graphics.PreferredBackBufferHeight = 700; // Sets the height of the window
             _graphics.ApplyChanges(); // Applies the new dimensions
 
-            coyoteRect = new Rectangle(100,200, 190, 190);
+            coyoteRect = new Rectangle(100,400, 190, 190);
             coyoteVector = new Vector2(0, 0);
 
-            roadrunnerRect = new Rectangle(300,200, 130, 130);
+            roadrunnerRect = new Rectangle(700,400, 130, 130);
             roadrunnerVector = new Vector2(0, 0);
 
             base.Initialize();
@@ -123,14 +127,33 @@ namespace _1_5__Big_Animation_Project
                     roadrunnerVector.Y = 0;
                     roadrunnerVector.X = 0;
                 }
-                if (keyboardState.IsKeyDown(Keys.Space))
-                    speed = 3;
-                else
-                    speed = 2;
+                
+
+               
+                    
+            
+                
+                
+
+                if (keyboardState.IsKeyDown(Keys.Space) && seconds <=5)
                 {
+                    speed = 3;
+                    seconds = (float)gameTime.TotalGameTime.TotalSeconds - startTime;
+                }
+                    
+                else
+                {
+                    speed = 2;                   
+                    startTime = (float)gameTime.TotalGameTime.TotalSeconds;
+                }
 
                     
-                }
+                
+                    
+
+
+
+                
                 if (roadrunnerRect.Y > coyoteRect.Bottom)
                     coyoteVector.Y = 1;
                 if (roadrunnerRect.Bottom < coyoteRect.Y)
@@ -171,6 +194,16 @@ namespace _1_5__Big_Animation_Project
                     roadrunnerRect.Y = _graphics.PreferredBackBufferHeight / 2;
                     roadrunnerVector.Y = 0;
                 }
+                //Hint Movement
+                hintLocation += 1;
+                if (hintLocation >= _graphics.PreferredBackBufferWidth)
+                    hintLocation = -600;
+                //Leave Animaion
+                if (coyoteRect.Contains(roadrunnerRect))
+                    screen = Screen.Outro;
+
+                if (keyboardState.IsKeyDown(Keys.Enter))
+                    screen = Screen.Outro;
 
             }
             else if (screen == Screen.Outro)
@@ -193,12 +226,18 @@ namespace _1_5__Big_Animation_Project
             {
                 _spriteBatch.Draw(inroBackround, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), Color.White);
                 _spriteBatch.DrawString(introTitleText, "Roadrunner Chase!", new Vector2(120, 350), Color.White);
-                _spriteBatch.DrawString(mediumText, "Click to Continue", new Vector2(120, 420), Color.White);
+                _spriteBatch.DrawString(mediumText, "Move with W, A, S, D keys", new Vector2(120, 420), Color.White);
+                _spriteBatch.DrawString(mediumText, "Don't get caught!", new Vector2(120, 470), Color.White);
+                _spriteBatch.DrawString(mediumText, "Click to Continue", new Vector2(120, 530), Color.White);
+
+
 
             }
             else if (screen == Screen.Animation)
             {
                 _spriteBatch.Draw(animationBackround, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), Color.White);
+                _spriteBatch.DrawString(mediumText, "Hint: press space for a boost", new Vector2(hintLocation, 100), Color.White);
+                _spriteBatch.DrawString(mediumText, $"Boost: {(5 - seconds).ToString("00.0")}", new Vector2(100, 200), Color.White);
 
                 if (coyoteVector.X == 1)
                     _spriteBatch.Draw(cSprintingRight, coyoteRect, Color.White);
@@ -225,8 +264,9 @@ namespace _1_5__Big_Animation_Project
             }
             else if (screen == Screen.Outro)
             {
-
+                _spriteBatch.DrawString(introTitleText, "Thank you for Playing", new Vector2(120, 350), Color.White);
                 
+
             }
             _spriteBatch.End();
             base.Draw(gameTime);
