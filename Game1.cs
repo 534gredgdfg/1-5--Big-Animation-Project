@@ -60,7 +60,7 @@ namespace _1_5__Big_Animation_Project
             boostBarGreen = new Rectangle(160, 160, 160, 50);
             boostBarRed = new Rectangle(160, 160, 160, 50);
 
-            roadrunnerRect = new Rectangle(700,400, 130, 130);
+            roadrunnerRect = new Rectangle(700,400, 140, 140);
             roadrunnerVector = new Vector2(0, 0);
 
             base.Initialize();
@@ -125,15 +125,13 @@ namespace _1_5__Big_Animation_Project
                 if (keyboardState.IsKeyDown(Keys.W))
                 {                    
                     roadrunnerVector.Y = -speed;
-                    //roadrunnerRect.Width -= 1;
-                    //roadrunnerRect.Height -= 1;
+                    
                 }
                 else if (keyboardState.IsKeyDown(Keys.S))
                 {
 
                     roadrunnerVector.Y = speed;
-                    //roadrunnerRect.Width += 1;
-                    //roadrunnerRect.Height += 1;
+                    
                 }
                 else if (keyboardState.IsKeyDown(Keys.A))
                 {
@@ -151,10 +149,7 @@ namespace _1_5__Big_Animation_Project
                     roadrunnerVector.Y = 0;
                     roadrunnerVector.X = 0;
                 }
-                if (roadrunnerRect.Width <= 100)
-                    roadrunnerRect.Width = 100;
-                if (roadrunnerRect.Height <= 100)
-                    roadrunnerRect.Height = 100;
+                
 
 
 
@@ -186,6 +181,7 @@ namespace _1_5__Big_Animation_Project
                     }
                                        
                 }
+
                
                 else
                 {
