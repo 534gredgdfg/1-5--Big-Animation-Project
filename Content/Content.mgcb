@@ -37,6 +37,30 @@
 /processorParam:TextureFormat=Color
 /build:animationBackround.webp
 
+#begin C:/Users/owenr/Downloads/rectangle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:C:/Users/owenr/Downloads/rectangle.png;rectangle.png
+
+#begin C:/Users/owenr/Downloads/roadrunnerSound1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:C:/Users/owenr/Downloads/roadrunnerSound1.wav;roadrunnerSound1.wav
+
+#begin C:/Users/owenr/Downloads/roadrunnerSound3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:C:/Users/owenr/Downloads/roadrunnerSound3.wav;roadrunnerSound3.wav
+
 #begin coyote-ready.gif
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -111,6 +135,18 @@
 /processorParam:TextureFormat=Compressed
 /build:mediumText.spritefont
 
+#begin rectangle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:rectangle.png
+
 #begin roadrunner-chased.gif
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -182,4 +218,10 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:roadrunner.png
+
+#begin roadrunnerSound2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:roadrunnerSound2.wav
 

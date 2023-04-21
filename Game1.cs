@@ -1,8 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-
+using System;
 namespace _1_5__Big_Animation_Project
 {
     public class Game1 : Game
@@ -11,17 +12,21 @@ namespace _1_5__Big_Animation_Project
         private SpriteBatch _spriteBatch;
         private SpriteFont introTitleText, mediumText;
         int speed = 2;
+        float timeInterval = 1;
         int hintLocation = -600;
         float seconds;
         float startTime;
-        float addingTime;
+        
         //c stands for Coyote and r stands for Roadrunner
-        Texture2D cStill, cSprintingRight, cSprintingLeft, cReady, rStill, rRunning, rRunningRight, rSprinting, rSprintingRight, inroBackround, animationBackround;
-        Rectangle coyoteRect, roadrunnerRect;
+        Texture2D cStill, cSprintingRight, cSprintingLeft, cReady, rStill, rRunning, rRunningRight, rSprinting, rSprintingRight, inroBackround, animationBackround, boostBarImgae;
+        Rectangle coyoteRect, coyoteRectHit, roadrunnerRect, boostBarGreen, boostBarRed;
         Vector2 coyoteVector, roadrunnerVector;
         MouseState mouseState;
         KeyboardState keyboardState;
+        SoundEffect roadrunnerSound1, roadrunnerSound2, roadrunnerSound3;
+        SoundEffectInstance roadrunnerSound1Inst, roadrunnerSound2Inst, roadrunnerSound3Inst;
         
+
         enum Screen
         {
             Intro,
@@ -35,18 +40,25 @@ namespace _1_5__Big_Animation_Project
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            
         }
 
         protected override void Initialize()
         {
+            
+                
             // TODO: Add your initialization logic here
             screen = Screen.Intro;
             _graphics.PreferredBackBufferWidth = 1000; // Sets the width of the window
             _graphics.PreferredBackBufferHeight = 700; // Sets the height of the window
             _graphics.ApplyChanges(); // Applies the new dimensions
 
-            coyoteRect = new Rectangle(100,400, 190, 190);
+            coyoteRect = new Rectangle(100,400, 160, 160);
+            coyoteRectHit = new Rectangle(130, 430, 100, 100);
             coyoteVector = new Vector2(0, 0);
+
+            boostBarGreen = new Rectangle(160, 160, 160, 50);
+            boostBarRed = new Rectangle(160, 160, 160, 50);
 
             roadrunnerRect = new Rectangle(700,400, 130, 130);
             roadrunnerVector = new Vector2(0, 0);
@@ -74,10 +86,19 @@ namespace _1_5__Big_Animation_Project
 
             introTitleText = Content.Load<SpriteFont>("Title");
             mediumText = Content.Load<SpriteFont>("mediumText");
+            boostBarImgae = Content.Load<Texture2D>("rectangle");
+
+            roadrunnerSound1 = Content.Load<SoundEffect>("roadrunnerSound1");
+            roadrunnerSound2 = Content.Load<SoundEffect>("roadrunnerSound2");
+            roadrunnerSound3 = Content.Load<SoundEffect>("roadrunnerSound3");
+            roadrunnerSound1Inst = roadrunnerSound1.CreateInstance();
+            roadrunnerSound2Inst = roadrunnerSound2.CreateInstance();
+            roadrunnerSound3Inst = roadrunnerSound3.CreateInstance();
         }
 
         protected override void Update(GameTime gameTime)
         {
+            
             mouseState = Mouse.GetState();
             keyboardState = Keyboard.GetState();
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -104,12 +125,15 @@ namespace _1_5__Big_Animation_Project
                 if (keyboardState.IsKeyDown(Keys.W))
                 {                    
                     roadrunnerVector.Y = -speed;
-                    
+                    //roadrunnerRect.Width -= 1;
+                    //roadrunnerRect.Height -= 1;
                 }
                 else if (keyboardState.IsKeyDown(Keys.S))
                 {
 
                     roadrunnerVector.Y = speed;
+                    //roadrunnerRect.Width += 1;
+                    //roadrunnerRect.Height += 1;
                 }
                 else if (keyboardState.IsKeyDown(Keys.A))
                 {
@@ -127,33 +151,49 @@ namespace _1_5__Big_Animation_Project
                     roadrunnerVector.Y = 0;
                     roadrunnerVector.X = 0;
                 }
-                
+                if (roadrunnerRect.Width <= 100)
+                    roadrunnerRect.Width = 100;
+                if (roadrunnerRect.Height <= 100)
+                    roadrunnerRect.Height = 100;
 
-               
-                    
-            
-                
-                
 
-                if (keyboardState.IsKeyDown(Keys.Space) && seconds <=5)
+
+                if (keyboardState.IsKeyDown(Keys.Space) && seconds >=0&& seconds <=20)
                 {
-                    speed = 3;
+                    speed = 4;
                     seconds = (float)gameTime.TotalGameTime.TotalSeconds - startTime;
+
+                    Random rand = new Random();
+                    bool soundPlaying = false;
+                    if (roadrunnerSound1Inst.State == SoundState.Playing || roadrunnerSound2Inst.State == SoundState.Playing || roadrunnerSound3Inst.State == SoundState.Playing)
+                        soundPlaying = true;
+                    int sound = rand.Next(1, 4);
+
+                    if (soundPlaying == false && sound == 1)
+                        roadrunnerSound1Inst.Play();
+
+                    else if (soundPlaying == false && sound == 2)
+                        roadrunnerSound2Inst.Play();
+
+                    else if (soundPlaying == false && sound == 3)
+                        roadrunnerSound3Inst.Play();
+
+                    if (seconds >=timeInterval)
+                    {
+                        timeInterval += 1;
+                        boostBarGreen.Width -= 8;
+
+                    }
+                                       
                 }
-                    
+               
                 else
                 {
                     speed = 2;                   
-                    startTime = (float)gameTime.TotalGameTime.TotalSeconds;
+                    startTime = (float)gameTime.TotalGameTime.TotalSeconds - seconds;
                 }
 
-                    
-                
-                    
-
-
-
-                
+  
                 if (roadrunnerRect.Y > coyoteRect.Bottom)
                     coyoteVector.Y = 1;
                 if (roadrunnerRect.Bottom < coyoteRect.Y)
@@ -167,8 +207,9 @@ namespace _1_5__Big_Animation_Project
 
                 coyoteRect.Y += (int)coyoteVector.Y;
                 coyoteRect.X += (int)coyoteVector.X;
+                coyoteRectHit.Y += (int)coyoteVector.Y;
+                coyoteRectHit.X += (int)coyoteVector.X;
 
-                
 
                 roadrunnerRect.Y += (int)roadrunnerVector.Y;
                 roadrunnerRect.X += (int)roadrunnerVector.X;
@@ -194,16 +235,16 @@ namespace _1_5__Big_Animation_Project
                     roadrunnerRect.Y = _graphics.PreferredBackBufferHeight / 2;
                     roadrunnerVector.Y = 0;
                 }
+                
                 //Hint Movement
                 hintLocation += 1;
                 if (hintLocation >= _graphics.PreferredBackBufferWidth)
                     hintLocation = -600;
                 //Leave Animaion
-                if (coyoteRect.Contains(roadrunnerRect))
+                if (coyoteRectHit.Intersects(roadrunnerRect))
                     screen = Screen.Outro;
 
-                if (keyboardState.IsKeyDown(Keys.Enter))
-                    screen = Screen.Outro;
+                
 
             }
             else if (screen == Screen.Outro)
@@ -237,16 +278,21 @@ namespace _1_5__Big_Animation_Project
             {
                 _spriteBatch.Draw(animationBackround, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), Color.White);
                 _spriteBatch.DrawString(mediumText, "Hint: press space for a boost", new Vector2(hintLocation, 100), Color.White);
-                _spriteBatch.DrawString(mediumText, $"Boost: {(5 - seconds).ToString("00.0")}", new Vector2(100, 200), Color.White);
+                _spriteBatch.DrawString(mediumText, "Boost:", new Vector2(20, 160), Color.White);
+
+                _spriteBatch.Draw(boostBarImgae, boostBarRed, Color.Red);
+                _spriteBatch.Draw(boostBarImgae, boostBarGreen, Color.Green);
+
 
                 if (coyoteVector.X == 1)
+
                     _spriteBatch.Draw(cSprintingRight, coyoteRect, Color.White);
                 else
                     _spriteBatch.Draw(cSprintingLeft, coyoteRect, Color.White);
 
-                if (roadrunnerVector.X == 0 && roadrunnerVector.Y ==0)
+                if (roadrunnerVector.X == 0 && roadrunnerVector.Y == 0)
                     _spriteBatch.Draw(rStill, roadrunnerRect, Color.White);
-                else if (speed == 3)
+                else if (speed == 4)
                 {
                     if (roadrunnerVector.X == speed)
                         _spriteBatch.Draw(rSprintingRight, roadrunnerRect, Color.White);
@@ -257,15 +303,15 @@ namespace _1_5__Big_Animation_Project
                 {
                     if (roadrunnerVector.X == speed)
                         _spriteBatch.Draw(rRunningRight, roadrunnerRect, Color.White);
-                    else 
+                    else
                         _spriteBatch.Draw(rRunning, roadrunnerRect, Color.White);
                 }
-                   
             }
             else if (screen == Screen.Outro)
             {
                 _spriteBatch.DrawString(introTitleText, "Thank you for Playing", new Vector2(120, 350), Color.White);
-                
+                _spriteBatch.DrawString(mediumText, "You got Caught!", new Vector2(250, 100), Color.White);
+
 
             }
             _spriteBatch.End();
