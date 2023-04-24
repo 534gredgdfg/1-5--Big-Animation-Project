@@ -18,14 +18,14 @@ namespace _1_5__Big_Animation_Project
         float startTime;
         
         //c stands for Coyote and r stands for Roadrunner
-        Texture2D cStill, cSprintingRight, cSprintingLeft, cReady, rStill, rRunning, rRunningRight, rSprinting, rSprintingRight, inroBackround, animationBackround, boostBarImgae;
+        Texture2D cSprintingRight, cSprintingLeft, rStill, rRunning, rRunningRight, rSprinting, rSprintingRight, inroBackround, animationBackround, boostBarImgae, outroBackround;
         Rectangle coyoteRect, coyoteRectHit, roadrunnerRect, boostBarGreen, boostBarRed;
         Vector2 coyoteVector, roadrunnerVector;
         MouseState mouseState;
         KeyboardState keyboardState;
         SoundEffect roadrunnerSound1, roadrunnerSound2, roadrunnerSound3;
         SoundEffectInstance roadrunnerSound1Inst, roadrunnerSound2Inst, roadrunnerSound3Inst;
-        
+        Song themeSong, gamplayMusic;
 
         enum Screen
         {
@@ -44,9 +44,7 @@ namespace _1_5__Big_Animation_Project
         }
 
         protected override void Initialize()
-        {
-            
-                
+        {                           
             // TODO: Add your initialization logic here
             screen = Screen.Intro;
             _graphics.PreferredBackBufferWidth = 1000; // Sets the width of the window
@@ -54,6 +52,7 @@ namespace _1_5__Big_Animation_Project
             _graphics.ApplyChanges(); // Applies the new dimensions
 
             coyoteRect = new Rectangle(100,400, 160, 160);
+            //Smaller hitbox for coyote
             coyoteRectHit = new Rectangle(130, 430, 100, 100);
             coyoteVector = new Vector2(0, 0);
 
@@ -73,11 +72,12 @@ namespace _1_5__Big_Animation_Project
             // TODO: use this.Content to load your game content here
             inroBackround = Content.Load<Texture2D>("introScreenRoadrunner");
             animationBackround = Content.Load<Texture2D>("animationBackround");
+            outroBackround = Content.Load<Texture2D>("roadrunnerOutroBackround");
 
-            cStill = Content.Load<Texture2D>("coyote-still");
+            
             cSprintingRight = Content.Load<Texture2D>("coyote-sprinting");
             cSprintingLeft = Content.Load<Texture2D>("coyote-sprinting-left");
-            cReady = Content.Load<Texture2D>("coyote-ready");
+           
             rStill = Content.Load<Texture2D>("roadrunner-still");
             rRunning = Content.Load<Texture2D>("roadrunner");
             rRunningRight = Content.Load<Texture2D>("roadrunner-right");
@@ -94,6 +94,8 @@ namespace _1_5__Big_Animation_Project
             roadrunnerSound1Inst = roadrunnerSound1.CreateInstance();
             roadrunnerSound2Inst = roadrunnerSound2.CreateInstance();
             roadrunnerSound3Inst = roadrunnerSound3.CreateInstance();
+            themeSong = Content.Load<Song>("Road Runner");
+            gamplayMusic = Content.Load<Song>("roadrunnerGameplayMusic");
         }
 
         protected override void Update(GameTime gameTime)
@@ -107,21 +109,26 @@ namespace _1_5__Big_Animation_Project
             // TODO: Add your update logic here
             if (screen == Screen.Intro)
             {
+                //Play them song on loop
+                if (MediaPlayer.State == MediaState.Stopped)
+                    MediaPlayer.Play(themeSong);
 
                 if (mouseState.LeftButton == ButtonState.Pressed)
                 {
                     screen = Screen.Animation;
-                    
+                    MediaPlayer.Stop();
                     _graphics.PreferredBackBufferWidth = 1200; // Sets the width of the window
                     _graphics.PreferredBackBufferHeight = 1000; // Sets the height of the window
                     _graphics.ApplyChanges(); // Applies the new dimensions
                 }
-
-
             }
             else if (screen == Screen.Animation)
             {
+                //Play music
+                if (MediaPlayer.State == MediaState.Stopped)
+                    MediaPlayer.Play(gamplayMusic);
 
+                //User input
                 if (keyboardState.IsKeyDown(Keys.W))
                 {                    
                     roadrunnerVector.Y = -speed;
@@ -149,10 +156,8 @@ namespace _1_5__Big_Animation_Project
                     roadrunnerVector.Y = 0;
                     roadrunnerVector.X = 0;
                 }
-                
-
-
-
+               
+                //Boost, play boost sound and change boost bar width
                 if (keyboardState.IsKeyDown(Keys.Space) && seconds >=0&& seconds <=20)
                 {
                     speed = 4;
@@ -189,7 +194,7 @@ namespace _1_5__Big_Animation_Project
                     startTime = (float)gameTime.TotalGameTime.TotalSeconds - seconds;
                 }
 
-  
+                //Makes coyote track user
                 if (roadrunnerRect.Y > coyoteRect.Bottom)
                     coyoteVector.Y = 1;
                 if (roadrunnerRect.Bottom < coyoteRect.Y)
@@ -200,13 +205,14 @@ namespace _1_5__Big_Animation_Project
                 if (roadrunnerRect.Right < coyoteRect.X)
                     coyoteVector.X = -1;
 
-
+                //Move coyote
                 coyoteRect.Y += (int)coyoteVector.Y;
                 coyoteRect.X += (int)coyoteVector.X;
+                //Move coyote hitbox
                 coyoteRectHit.Y += (int)coyoteVector.Y;
                 coyoteRectHit.X += (int)coyoteVector.X;
 
-
+                //Move roadrunner
                 roadrunnerRect.Y += (int)roadrunnerVector.Y;
                 roadrunnerRect.X += (int)roadrunnerVector.X;
 
@@ -226,9 +232,9 @@ namespace _1_5__Big_Animation_Project
                     roadrunnerRect.Y = _graphics.PreferredBackBufferHeight - roadrunnerRect.Height;
                     roadrunnerVector.Y = 0;
                 }
-                else if (roadrunnerRect.Y <= _graphics.PreferredBackBufferHeight/2)
+                else if (roadrunnerRect.Y <= _graphics.PreferredBackBufferHeight/2- 100)
                 {
-                    roadrunnerRect.Y = _graphics.PreferredBackBufferHeight / 2;
+                    roadrunnerRect.Y = _graphics.PreferredBackBufferHeight / 2 - 100;
                     roadrunnerVector.Y = 0;
                 }
                 
@@ -238,17 +244,17 @@ namespace _1_5__Big_Animation_Project
                     hintLocation = -600;
                 //Leave Animaion
                 if (coyoteRectHit.Intersects(roadrunnerRect))
+                {
+                    MediaPlayer.Stop();
                     screen = Screen.Outro;
-
-                
+                }  
 
             }
             else if (screen == Screen.Outro)
             {
                 
-
-
-
+                if (MediaPlayer.State == MediaState.Stopped)
+                    MediaPlayer.Play(themeSong);
             }
             base.Update(gameTime);
         }
@@ -266,28 +272,29 @@ namespace _1_5__Big_Animation_Project
                 _spriteBatch.DrawString(mediumText, "Move with W, A, S, D keys", new Vector2(120, 420), Color.White);
                 _spriteBatch.DrawString(mediumText, "Don't get caught!", new Vector2(120, 470), Color.White);
                 _spriteBatch.DrawString(mediumText, "Click to Continue", new Vector2(120, 530), Color.White);
-
-
-
             }
             else if (screen == Screen.Animation)
             {
+                
                 _spriteBatch.Draw(animationBackround, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), Color.White);
                 _spriteBatch.DrawString(mediumText, "Hint: press space for a boost", new Vector2(hintLocation, 100), Color.White);
                 _spriteBatch.DrawString(mediumText, "Boost:", new Vector2(20, 160), Color.White);
 
+                //Draw boost bar
                 _spriteBatch.Draw(boostBarImgae, boostBarRed, Color.Red);
                 _spriteBatch.Draw(boostBarImgae, boostBarGreen, Color.Green);
 
-
+                //Coyote faces right 
                 if (coyoteVector.X == 1)
 
                     _spriteBatch.Draw(cSprintingRight, coyoteRect, Color.White);
+                //Coyote faces left
                 else
                     _spriteBatch.Draw(cSprintingLeft, coyoteRect, Color.White);
-
+                //Roadrunner when still
                 if (roadrunnerVector.X == 0 && roadrunnerVector.Y == 0)
                     _spriteBatch.Draw(rStill, roadrunnerRect, Color.White);
+                //Roadrunner with boost
                 else if (speed == 4)
                 {
                     if (roadrunnerVector.X == speed)
@@ -295,6 +302,7 @@ namespace _1_5__Big_Animation_Project
                     else
                         _spriteBatch.Draw(rSprinting, roadrunnerRect, Color.White);
                 }
+                //Roadrunner without boost
                 else
                 {
                     if (roadrunnerVector.X == speed)
@@ -305,9 +313,10 @@ namespace _1_5__Big_Animation_Project
             }
             else if (screen == Screen.Outro)
             {
-                _spriteBatch.DrawString(introTitleText, "Thank you for Playing", new Vector2(120, 350), Color.White);
-                _spriteBatch.DrawString(mediumText, "You got Caught!", new Vector2(250, 100), Color.White);
-
+                
+                _spriteBatch.Draw(outroBackround, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), Color.White);
+                _spriteBatch.DrawString(mediumText, "You got Caught!", new Vector2(350, 350), Color.White);
+                _spriteBatch.DrawString(introTitleText, "Thank you for Playing", new Vector2(350, 450), Color.White);
 
             }
             _spriteBatch.End();

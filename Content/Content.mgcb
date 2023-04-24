@@ -147,6 +147,12 @@
 /processorParam:TextureFormat=Color
 /build:rectangle.png
 
+#begin Road Runner.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Road Runner.mp3
+
 #begin roadrunner-chased.gif
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -218,6 +224,24 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:roadrunner.png
+
+#begin roadrunnerGameplayMusic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:roadrunnerGameplayMusic.mp3
+
+#begin roadrunnerOutroBackround.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:roadrunnerOutroBackround.png
 
 #begin roadrunnerSound2.wav
 /importer:WavImporter
